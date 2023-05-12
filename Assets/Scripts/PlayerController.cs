@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
 
     private int upForce;
     private bool isGround;
+    [SerializeField] float rotSpeed;
 
     void Start()
     {
@@ -32,26 +33,37 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-     //カーソルキーの入力を取得
-     var moveHorizontal=Input.GetAxis("Horizontal");
-     var moveVertical=Input.GetAxis("Vertical");
-     if (Input.GetKey(KeyCode.Space) && isGround)
+        //カーソルキーの入力を取得
+        var moveHorizontal=Input.GetAxis("Horizontal");
+        var moveVertical=Input.GetAxis("Vertical");
+        var forwardDir = Camera.main.transform.forward * moveVertical;
+        var rightDir = Camera.main.transform.right * moveHorizontal;
+        var movement = (forwardDir + rightDir).normalized;
+        if (Input.GetKey(KeyCode.Space) && isGround)
+            {
+                rb.AddForce(new Vector3(0, upForce, 0));
+            }
+
+        var rot = 0.0f;
+        if (Input.GetKey(KeyCode.J))
         {
-            rb.AddForce(new Vector3(0, upForce, 0));
+            rot = -1.0f;
+        }else if (Input.GetKey(KeyCode.K))
+        {
+            rot = 1.0f;
         }
-            
+        transform.Rotate(new Vector3(0,rot,0) * rotSpeed * Time.deltaTime);
 
-     //カーソルキーの入力に合わせて移動方向を設定
-     var movement=new Vector3(moveHorizontal,0,moveVertical);
-
-     //Ridigbodyに力を与えて球を動かす
-     rb.AddForce(movement*speed);
+         //Ridigbodyに力を与えて球を動かす
+        rb.AddForce(movement*speed);
 
         if (transform.position.y < -10)
         {
             SceneManager.LoadScene("SampleScene");
         }
     }
+
+
 
     //球がほかのオブジェクトにぶつかった時に呼び出される
      void OnTriggerEnter(Collider other)
@@ -76,24 +88,24 @@ public class PlayerController : MonoBehaviour
         scoreText.text="Count:"+score.ToString();
 
         //すべての収集アイテムを獲得した場合
-   /*     if (score >= 5)
+        if (score >= 7)
         {
             //リザルトの表示を更新
             WinText.text="You Win!";
             Time.timeScale = 0.0f;
-       }*/
+       }
     }
 
 
     private void OnCollisionStay(Collision collision)
     {
-        if (collision.gameObject.name == "Ground")
+        if (collision.gameObject.tag == "Ground")
             isGround = true;
     }
 
     void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.name == "Ground")
+        if (collision.gameObject.tag == "Ground")
             isGround = false;
     }
 }
