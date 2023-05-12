@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     {
       //Rigidbodyを取得
       rb=GetComponent<Rigidbody>();
-        upForce = 200;
+        upForce = 20;
 
         //UIを初期化
         score =0;
@@ -35,11 +35,14 @@ public class PlayerController : MonoBehaviour
      //カーソルキーの入力を取得
      var moveHorizontal=Input.GetAxis("Horizontal");
      var moveVertical=Input.GetAxis("Vertical");
-        if (Input.GetKey("space") && isGround)
+     if (Input.GetKey(KeyCode.Space) && isGround)
+        {
             rb.AddForce(new Vector3(0, upForce, 0));
+        }
+            
 
-        //カーソルキーの入力に合わせて移動方向を設定
-        var movement=new Vector3(moveHorizontal,2,moveVertical);
+     //カーソルキーの入力に合わせて移動方向を設定
+     var movement=new Vector3(moveHorizontal,0,moveVertical);
 
      //Ridigbodyに力を与えて球を動かす
      rb.AddForce(movement*speed);
@@ -73,23 +76,24 @@ public class PlayerController : MonoBehaviour
         scoreText.text="Count:"+score.ToString();
 
         //すべての収集アイテムを獲得した場合
-        if (score >= 5)
+   /*     if (score >= 5)
         {
             //リザルトの表示を更新
             WinText.text="You Win!";
             Time.timeScale = 0.0f;
-        }
+       }*/
     }
 
-    void OnTriggerStay(Collider other)
+
+    private void OnCollisionStay(Collision collision)
     {
-        if (other.gameObject.name == "Plane")
+        if (collision.gameObject.name == "Ground")
             isGround = true;
     }
 
-    void OnTriggerExit(Collider other)
+    void OnCollisionExit(Collision collision)
     {
-        if (other.gameObject.name == "Plane")
+        if (collision.gameObject.name == "Ground")
             isGround = false;
     }
 }
